@@ -8,11 +8,6 @@ output "cf_arn" {
   description = "ID of AWS CloudFront distribution"
 }
 
-output "cf_aliases" {
-  value       = "${aws_cloudfront_distribution.default.aliases}"
-  description = "Extra CNAMEs of AWS CloudFront"
-}
-
 output "cf_status" {
   value       = "${aws_cloudfront_distribution.default.status}"
   description = "Current status of the distribution"

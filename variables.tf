@@ -236,8 +236,8 @@ variable "parent_zone_name" {
   description = "Name of the hosted zone to contain this record (or specify `parent_zone_id`)"
 }
 
-variable "cache_behavior" {
+variable "ordered_cache_behavior" {
   type        = "list"
-  description = "List of cache behaviors to implement"
+  description = "An ordered list of cache behaviors resource for this distribution"
   default     = []
 }

@@ -12,20 +12,6 @@ resource "aws_cloudfront_origin_access_identity" "default" {
   comment = "${module.distribution_label.id}"
 }
 
-module "logs" {
-  source                   = "git::https://github.com/cloudposse/terraform-aws-log-storage.git?ref=tags/0.2.2"
-  namespace                = "${var.namespace}"
-  stage                    = "${var.stage}"
-  name                     = "${var.name}"
-  delimiter                = "${var.delimiter}"
-  attributes               = ["${compact(concat(var.attributes, list("origin", "logs")))}"]
-  tags                     = "${var.tags}"
-  prefix                   = "${var.log_prefix}"
-  standard_transition_days = "${var.log_standard_transition_days}"
-  glacier_transition_days  = "${var.log_glacier_transition_days}"
-  expiration_days          = "${var.log_expiration_days}"
-}
-
 module "distribution_label" {
   source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.3.7"
   namespace  = "${var.namespace}"
@@ -42,12 +28,6 @@ resource "aws_cloudfront_distribution" "default" {
   comment             = "${var.comment}"
   default_root_object = "${var.default_root_object}"
   price_class         = "${var.price_class}"
-
-  logging_config = {
-    include_cookies = "${var.log_include_cookies}"
-    bucket          = "${module.logs.bucket_domain_name}"
-    prefix          = "${var.log_prefix}"
-  }
 
   aliases = ["${var.aliases}"]
 
@@ -98,7 +78,7 @@ resource "aws_cloudfront_distribution" "default" {
     max_ttl                = "${var.max_ttl}"
   }
 
-  cache_behavior = "${var.cache_behavior}"
+  ordered_cache_behavior = "${var.ordered_cache_behavior}"
 
   web_acl_id = "${var.web_acl_id}"
 
@@ -112,12 +92,12 @@ resource "aws_cloudfront_distribution" "default" {
   tags = "${module.distribution_label.tags}"
 }
 
-module "dns" {
-  source           = "git::https://github.com/cloudposse/terraform-aws-route53-alias.git?ref=tags/0.2.5"
-  enabled          = "${var.dns_aliases_enabled}"
-  aliases          = "${var.aliases}"
-  parent_zone_id   = "${var.parent_zone_id}"
-  parent_zone_name = "${var.parent_zone_name}"
-  target_dns_name  = "${aws_cloudfront_distribution.default.domain_name}"
-  target_zone_id   = "${aws_cloudfront_distribution.default.hosted_zone_id}"
-}
+//module "dns" {
+//  source           = "git::https://github.com/cloudposse/terraform-aws-route53-alias.git?ref=tags/0.2.5"
+//  enabled          = "${var.dns_aliases_enabled}"
+//  aliases          = "${var.aliases}"
+//  parent_zone_id   = "${var.parent_zone_id}"
+//  parent_zone_name = "${var.parent_zone_name}"
+//  target_dns_name  = "${aws_cloudfront_distribution.default.domain_name}"
+//  target_zone_id   = "${aws_cloudfront_distribution.default.hosted_zone_id}"
+//}
